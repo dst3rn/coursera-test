@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calendar</title>
+  
+  <style>
+    table {
+      width: 300px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid black;
+      text-align: center;
+      padding: 10px;
+    }
+    th {
+      background-color: #f1f1f1;
+    }
+    .day {
+      cursor: pointer;
+    }
+    /* Add some styling for the context menu */
+    #contextMenu {
+      display: none;
+      position: absolute;
+      border: 1px solid #ccc;
+      background-color: #fff;
+    }
+    /* New styling for remove name menu */
+    .menu-item {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .menu-item:hover {
+    background-color: #ddd;
+  }
+/* Instructions */
+#instructions {
+  position: absolute;
+  top: 0;
+  left: 500px;  /* You can adjust this */
+  width: 300px;  /* You can adjust this too */
+}
+
+  </style>
+</head>
+<body>
+
+<h2>November 2023</h2>
+<form id="availabilityForm">
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name">
+  <input type="submit" value="Submit">
+  <button type="button" id="clearCalendar">Clear Calendar</button>
+</form>
+
+<!-- Context Menu Div -->
+<div id="contextMenu"></div>
+
+<table id="calendar">
+    <tr>
+      <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+    </tr>
+    <tr>
+      <td></td><td></td><td></td>
+      <td class="day" data-day="1">1</td>
+      <td class="day" data-day="2">2</td>
+      <td class="day" data-day="3">3</td>
+      <td class="day" data-day="4">4</td>
+    </tr>
+    <tr>
+      <td class="day" data-day="5">5</td>
+      <td class="day" data-day="6">6</td>
+      <td class="day" data-day="7">7</td>
+      <td class="day" data-day="8">8</td>
+      <td class="day" data-day="9">9</td>
+      <td class="day" data-day="10">10</td>
+      <td class="day" data-day="11">11</td>
+    </tr>
+    <tr>
+      <td class="day" data-day="12">12</td>
+      <td class="day" data-day="13">13</td>
+      <td class="day" data-day="14">14</td>
+      <td class="day" data-day="15">15</td>
+      <td class="day" data-day="16">16</td>
+      <td class="day" data-day="17">17</td>
+      <td class="day" data-day="18">18</td>
+    </tr>
+    <tr>
+      <td class="day" data-day="19">19</td>
+      <td class="day" data-day="20">20</td>
+      <td class="day" data-day="21">21</td>
+      <td class="day" data-day="22">22</td>
+      <td class="day" data-day="23">23</td>
+      <td class="day" data-day="24">24</td>
+      <td class="day" data-day="25">25</td>
+    </tr>
+    <tr>
+      <td class="day" data-day="26">26</td>
+      <td class="day" data-day="27">27</td>
+      <td class="day" data-day="28">28</td>
+      <td class="day" data-day="29">29</td>
+      <td class="day" data-day="30">30</td>
+      <td></td><td></td>
+    </tr>
+  </table>
+
+  <div id="instructions">
+    <h3>How to Use the Calendar:</h3>
+    <ol>
+      <li>Select the dates you are available.</li>
+      <li>Enter your name in the box above the calendar.</li>
+      <li>Click "Enter" on your keyboard or click the "Submit" button.</li>
+    </ol>
+    <p>Note - if you need to remove your name from a day, right click on the day and select your name.</p>
+  </div>
+  
+
+  <script>
+    // Array to hold the selected days
+    const selectedDays = [];
+
+    function updateCellColor(cell) {
+  const names = cell.getAttribute('data-names') || '';
+  const nameCount = names ? names.split(', ').length : 0;
+  
+  switch (nameCount) {
+    case 0:
+      cell.style.backgroundColor = ""; // White
+      break;
+    case 1:
+      cell.style.backgroundColor = "rgba(255, 0, 0, 0.3)"; // Red
+      break;
+    case 2:
+      cell.style.backgroundColor = "rgba(255, 165, 0, 0.3)"; // Orange
+      break;
+    case 3:
+      cell.style.backgroundColor = "rgba(255, 255, 0, 0.3)"; // Yellow
+      break;
+    case 4:
+      cell.style.backgroundColor = "rgba(0, 255, 0, 0.3)"; // Green
+      break;
+    default:
+      cell.style.backgroundColor = ""; // White for other cases
+  }
+}
+
+  
+    // Listen for clicks on day cells
+    document.querySelectorAll('.day').forEach(cell => {
+  cell.addEventListener('click', function() {
+        const day = this.getAttribute('data-day');
+        if (selectedDays.includes(day)) {
+          selectedDays.splice(selectedDays.indexOf(day), 1);
+          this.style.backgroundColor = "";
+        } else {
+          selectedDays.push(day);
+          this.style.backgroundColor = "#ddd";
+        }
+      });
+    });
+  
+// Listen for form submit
+document.getElementById('availabilityForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+
+  selectedDays.forEach(day => {
+    const cell = document.querySelector(`[data-day="${day}"]`);
+    const existingNames = cell.getAttribute('data-names') || '';
+    cell.setAttribute('data-names', existingNames ? `${existingNames}, ${name}` : name);
+    cell.innerHTML = `${day}<br>${cell.getAttribute('data-names')}`;
+    updateCellColor(cell);
+  });
+
+  document.getElementById('name').value = '';
+  selectedDays.length = 0;
+});
+
+  // Clear the name input and reset the background colors
+function clearAllNames() {
+  const cells = document.querySelectorAll('.day');
+  cells.forEach(cell => {
+    cell.setAttribute('data-names', '');
+    const day = cell.getAttribute('data-day');
+    cell.innerHTML = day;
+    updateCellColor(cell); // Reset the color too
+  });
+  document.getElementById('name').value = '';
+  selectedDays.length = 0;
+  document.querySelectorAll('.day').forEach(cell => cell.style.backgroundColor = "");
+}
+// Clear Calendar button event
+document.getElementById('clearCalendar').addEventListener('click', function() {
+  clearAllNames();
+});
+
+  
+    // Listen for right-click on day cells
+    document.addEventListener('contextmenu', function(event) {
+      event.preventDefault();
+      const target = event.target.closest('.day');
+      if (!target) return;
+  
+      const day = target.getAttribute('data-day');
+      const names = (target.getAttribute('data-names') || '').split(', ');
+  
+        // Build the context menu
+        const contextMenu = document.getElementById('contextMenu');
+        contextMenu.innerHTML = '';
+        names.forEach((name) => {
+        if (name) {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'menu-item';  // Add this line
+            menuItem.textContent = name;
+            menuItem.onclick = function() {
+            removeName(day, name);
+            contextMenu.style.display = 'none';
+            };
+            contextMenu.appendChild(menuItem);
+        }
+        });
+  
+        // Show the context menu
+        contextMenu.style.top = event.clientY + 'px';
+        contextMenu.style.left = event.clientX + 'px';
+        contextMenu.style.display = 'block';
+        });
+    
+        // Hide context menu when clicking elsewhere
+        document.addEventListener('click', function() {
+        document.getElementById('contextMenu').style.display = 'none';
+        });
+  
+// Function to remove a name
+function removeName(day, nameToRemove) {
+  const cell = document.querySelector(`[data-day="${day}"]`);
+  let existingNames = cell.getAttribute('data-names');
+  
+  if (existingNames) {
+    existingNames = existingNames.split(', ');
+    const index = existingNames.indexOf(nameToRemove);
+    
+    if (index > -1) {
+      existingNames.splice(index, 1);
+      const updatedNames = existingNames.join(', ');
+      cell.setAttribute('data-names', updatedNames);
+      cell.innerHTML = `${day}<br>${updatedNames}`;
+      updateCellColor(cell);  // <-- Call the new function here
+    }
+  }
+}
+
+
+// Add this function to clear all names and reset colors
+function clearAllNames() {
+  const cells = document.querySelectorAll('.day');
+  cells.forEach(cell => {
+    cell.setAttribute('data-names', '');
+    const day = cell.getAttribute('data-day');
+    cell.innerHTML = day;
+    updateCellColor(cell); // Reset the color too
+  });
+}
+
+
+  </script>
+  
+  </body>
+  </html>
+
