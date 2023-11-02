@@ -1,0 +1,23 @@
+<DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Unordered Lists</title>
+</head>
+<body> 
+    <h1>Unordered Lists</h1>
+    <div>
+        My grocery list:
+        <ul>
+            <li>Sweetened oat milk</li>
+            <li>tofu</li>
+            <li>beans
+               <ul>
+                <li>black</li>
+                <li>pinto</li>
+                <li>garbanzo</li>
+               </ul>
+            </li>
+            <li>brocolli</li>
+        </ul>    
+</body>
